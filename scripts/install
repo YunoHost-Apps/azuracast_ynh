@@ -48,6 +48,17 @@ popd
 #chown "$app:$app" "$install_dir/"
 
 
+
+# Initialize the mysql db
+
+mysql -B $app < $install_dir/src/util/docker/mariadb/mariadb/db.sql
+
+# FIXME / TODO
+# For some reason the app complained about Field '<some file>' doesn't have a default value
+# ... a savage hack is to remove the STRICT_TRANS_TABLES from the sql mode ... though I have no clue if that's legit, that sounds pretty brutal
+# cf: SHOW VARIABLES LIKE 'sql_mode';
+# SET GLOBAL sql_mode='ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+
 #=================================================
 # SYSTEM CONFIGURATION
 #=================================================
@@ -56,7 +67,6 @@ ynh_script_progression "Adding system configurations related to $app..."
 ynh_config_add_phpfpm
 
 ynh_config_add_nginx
-
 
 #=================================================
 # FINALIZE APP INSTALL WITH CURL
