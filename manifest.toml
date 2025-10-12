@@ -1,0 +1,64 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/main/schemas/manifest.v2.schema.json
+
+packaging_format = 2
+
+id = "azuracast"
+name = "AzuraCast"
+
+description.en = "Web radio management suite"
+description.fr = "Gestion de webradio"
+
+version = "0.23.1~ynh1"
+
+[upstream]
+license = "AGPL-3.0"
+website = "https://www.azuracast.com/"
+demo = "https://demo.azuracast.com/"
+admindoc = "https://www.azuracast.com/docs/"
+
+code = "https://github.com/AzuraCast/AzuraCast"
+
+[integration]
+yunohost = '>= 11.2.30'
+helpers_version = "2.1"
+architectures = "amd64" 
+multi_instance = false
+ldap = "false" 
+sso = "false"
+disk = "50M"
+ram.build = "50M"
+ram.runtime = "50M"
+
+[install]
+
+    [install.domain]
+    type = "domain"
+
+    [install.init_main_permission]
+    type = "group"
+    default = "all_users"
+
+[resources]
+
+    [resources.sources]
+
+        [resources.sources.main]
+        url = "https://github.com/AzuraCast/AzuraCast/archive/refs/tags/0.23.1.tar.gz"
+        sha256 = "4ae79e07b774646216e0f8ea3caa149289b7aece8057b2031e139260f64017d5"
+
+        autoupdate.strategy = "latest_github_tag"
+
+    [resources.permissions]
+    main.url = "/"
+
+    [resources.apt]
+    packages = "mariadb-server tini gosu rsync tzdata ffmpeg vorbis-tools flac bubblewrap libao4 libfaad2 libfdk-aac2 libgd3 liblo7 libmad0 libmagic1 libportaudio2 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsoundtouch1 libxpm4 libpulse0 libsamplerate0 libtag2 libsrt1.5-openssl liblilv-0-0 libxml2 libxslt1.1 tmpreaper zstd libid3tag0 libboost-program-options1.81.0 libboost-filesystem1.81.0 libboost-regex1.81.0 php8.4-gd php8.4-curl php8.4-xml php8.4-zip php8.4-gmp php8.4-pdo_mysql php8.4-mbstring php8.4-intl php8.4-redis php8.4-maxminddb php8.4-uuid php8.4-ffi php8.4-sockets ladspa-sdk icecast2 liquidsoap "
+
+    [resources.database]
+    type = "mysql"
+    
+    [resources.nodejs]
+    version = "24"
+
+    [resources.composer]
+    version = "2.8.12"
