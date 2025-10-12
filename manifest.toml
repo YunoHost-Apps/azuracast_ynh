@@ -48,6 +48,20 @@ ram.runtime = "50M"
 
         autoupdate.strategy = "latest_github_tag"
 
+# To be checked later but the upstream Docker does something like:
+
+# wget "https://github.com/trummerschlunk/master_me/releases/download/1.2.0/master_me-1.2x-x86_64.tar.xz"
+# mv master_me-1.2*x86_64.tar.xz master_me.tar.xz
+# tar -xvf master_me.tar.xz --strip-components=1
+# mkdir -p /usr/lib/ladspa
+# mkdir -p /usr/lib/lv2
+# mv ./master_me-easy-presets.lv2 /usr/lib/lv2
+# mv ./master_me.lv2 /usr/lib/lv2
+# mv ./master_me-ladspa.so /usr/lib/ladspa/master_me.so
+
+# Dunno how important that is
+
+
     [resources.permissions]
     main.url = "/"
 
