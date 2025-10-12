@@ -16,7 +16,7 @@ ynh_script_progression "Setting up source files..."
 
 ynh_setup_source --dest_dir="$install_dir/src"
 
-push $install_dir
+pushd $install_dir
     mkdir -p stations backups storage/uploads storage/shoutcast2 storage/stereo_tool storage/rsas storage/geoip storage/sftpgo storage/acm
 popd
 
