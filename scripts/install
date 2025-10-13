@@ -34,6 +34,7 @@ pushd $install_dir
     ynh_composer_exec dump-autoload --optimize --classmap-authoritative
 
     npm ci
+    npm run build
 
 popd
 
