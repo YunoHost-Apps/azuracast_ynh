@@ -30,6 +30,7 @@ ynh_script_progression "Installing $app..."
 
 pushd $install_dir/src
 
+    composer_workdir=$install_dir/src
     ynh_composer_exec install --no-dev --no-autoloader 
     ynh_composer_exec dump-autoload --optimize --classmap-authoritative
 
