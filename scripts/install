@@ -35,6 +35,7 @@ pushd $install_dir/src
     ynh_composer_exec dump-autoload --optimize --classmap-authoritative
 
     ynh_exec_as_app npm ci
+    ynh_exec_as_app npm run build
 
 popd
 
@@ -51,6 +52,13 @@ popd
 
 
 # Initialize the mysql db
+ls -l src
+ls -l src/util
+ls -l src/util/docker
+ls -l src/util/docker/mariadb
+ls -l src/util/docker/mariadb/mariadb
+ls -l src/util/docker/mariadb/mariadb/db.sql
+
 
 mysql -B $app < $install_dir/src/util/docker/mariadb/mariadb/db.sql
 
