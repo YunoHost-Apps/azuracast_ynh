@@ -1,5 +1,4 @@
 #!/bin/bash
-### App file generated with YoloGen, the Yunohost app generator, version .
 
 source _common.sh
 source /usr/share/yunohost/helpers
@@ -31,6 +30,7 @@ ynh_script_progression "Installing $app..."
 pushd $install_dir/src
 
     composer_workdir=$install_dir/src
+    mv ../composer.phar ./
     ynh_composer_exec install --no-dev --no-autoloader 
     ynh_composer_exec dump-autoload --optimize --classmap-authoritative
 
