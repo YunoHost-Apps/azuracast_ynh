@@ -52,12 +52,12 @@ popd
 
 
 # Initialize the mysql db
-ls -l src
-ls -l src/util
-ls -l src/util/docker
-ls -l src/util/docker/mariadb
-ls -l src/util/docker/mariadb/mariadb
-ls -l src/util/docker/mariadb/mariadb/db.sql
+ls -l $install_dir/src
+ls -l $install_dir/src/util
+ls -l $install_dir/src/util/docker
+ls -l $install_dir/src/util/docker/mariadb
+ls -l $install_dir/src/util/docker/mariadb/mariadb
+ls -l $install_dir/src/util/docker/mariadb/mariadb/db.sql
 
 
 mysql -B $app < $install_dir/src/util/docker/mariadb/mariadb/db.sql
