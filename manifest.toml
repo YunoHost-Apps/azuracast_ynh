@@ -61,6 +61,10 @@ ram.runtime = "50M"
 
 # Dunno how important that is
 
+    [resources.system_user]
+
+    [resources.install_dir]
+    group = "www-data:r-x"
 
     [resources.permissions]
     main.url = "/"
