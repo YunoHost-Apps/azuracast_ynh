@@ -50,17 +50,11 @@ popd
 #chown "$app:$app" "$install_dir/"
 
 
-
 # Initialize the mysql db
-ls -l $install_dir/src
-ls -l $install_dir/src/util
-ls -l $install_dir/src/util/docker
-ls -l $install_dir/src/util/docker/mariadb
-ls -l $install_dir/src/util/docker/mariadb/mariadb
-ls -l $install_dir/src/util/docker/mariadb/mariadb/db.sql
-
-
-mysql -B $app < $install_dir/src/util/docker/mariadb/mariadb/db.sql
+# Fucking archive doesnt shit the goddamn util/docker folder because of https://github.com/AzuraCast/AzuraCast/blob/main/.gitattributes#L21
+# so we have to fetch this shit manually
+curl -s https://raw.githubusercontent.com/AzuraCast/AzuraCast/refs/tags/$(ynh_app_upstream_version)/util/docker/mariadb/mariadb/db.sql > init_db.sql
+mysql -B $app < init_db.sql
 
 # FIXME / TODO
 # For some reason the app complained about Field '<some file>' doesn't have a default value
