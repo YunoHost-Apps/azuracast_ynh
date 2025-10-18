@@ -54,6 +54,8 @@ popd
 # Fucking archive doesnt shit the goddamn util/docker folder because of https://github.com/AzuraCast/AzuraCast/blob/main/.gitattributes#L21
 # so we have to fetch this shit manually
 curl -s https://raw.githubusercontent.com/AzuraCast/AzuraCast/refs/tags/$(ynh_app_upstream_version)/util/docker/mariadb/mariadb/db.sql > init_db.sql
+# For some reason these 2 lines from the dump trigger : ERROR at line 1 in file: 'init_db.sql': Unknown command '\-'. .....
+sed -i '/.*enable the sandbox mode.*/d' init_db.sql
 mysql -B $app < init_db.sql
 
 # FIXME / TODO
