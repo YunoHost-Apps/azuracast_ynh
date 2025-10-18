@@ -4,28 +4,18 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# INSTALL DEPENDENCIES
-#=================================================
-ynh_script_progression "Installing dependencies..."
-
-#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression "Setting up source files..."
 
 ynh_setup_source --dest_dir="$install_dir/src"
 
-pushd $install_dir
-    mkdir -p stations backups storage/uploads storage/shoutcast2 storage/stereo_tool storage/rsas storage/geoip storage/sftpgo storage/acm
-popd
-
 chown -R $app:www-data "$install_dir"
-
 
 #=================================================
 # INSTALL APP
 #=================================================
-ynh_script_progression "Installing $app..."
+ynh_script_progression "Building $app... this will take some time..."
 
 pushd $install_dir/src
 
@@ -39,30 +29,6 @@ pushd $install_dir/src
 
 popd
 
-#=================================================
-# ADD A CONFIGURATION
-#=================================================
-#ynh_script_progression "Adding app's configuration file..."
-
-#ynh_config_add --template="" --destination="$install_dir/"
-#
-#chmod 400 "$install_dir/"
-#chown "$app:$app" "$install_dir/"
-
-
-# Initialize the mysql db
-# Fucking archive doesnt shit the goddamn util/docker folder because of https://github.com/AzuraCast/AzuraCast/blob/main/.gitattributes#L21
-# so we have to fetch this shit manually
-curl -s https://raw.githubusercontent.com/AzuraCast/AzuraCast/refs/tags/$(ynh_app_upstream_version)/util/docker/mariadb/mariadb/db.sql > init_db.sql
-# For some reason these 2 lines from the dump trigger : ERROR at line 1 in file: 'init_db.sql': Unknown command '\-'. .....
-sed -i '/.*enable the sandbox mode.*/d' init_db.sql
-mysql -B $app < init_db.sql
-
-# FIXME / TODO
-# For some reason the app complained about Field '<some file>' doesn't have a default value
-# ... a savage hack is to remove the STRICT_TRANS_TABLES from the sql mode ... though I have no clue if that's legit, that sounds pretty brutal
-# cf: SHOW VARIABLES LIKE 'sql_mode';
-# SET GLOBAL sql_mode='ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 
 #=================================================
 # SYSTEM CONFIGURATION
@@ -71,15 +37,43 @@ ynh_script_progression "Adding system configurations related to $app..."
 
 ynh_config_add_phpfpm
 
-# FIXME : we shouldnt have to do this zblerg
-sed -i "s@chdir =.*@chdir = $install_dir/src@g" /etc/php/$php_version/fpm/pool.d/$app.conf
-
 ynh_config_add_nginx
 
+
 #=================================================
-# FINALIZE APP INSTALL WITH CURL
+ynh_script_progression "Configuring $app..."
 #=================================================
-ynh_script_progression "Finalizing installation..."
+
+redis_db=$(ynh_redis_get_free_db)
+
+ynh_config_add --template="azuracast.env" --destination="$install_dir/src/azuracast.env"
+
+for DIR in backups stations www_tmp storage
+do
+    ln -s $install_dir/$DIR $data_dir/$DIR
+done
+
+# Initialize the mysql db
+# Fucking archive doesnt shit the goddamn util/docker folder because of https://github.com/AzuraCast/AzuraCast/blob/main/.gitattributes#L21
+# so we have to fetch this shit manually
+#curl -s https://raw.githubusercontent.com/AzuraCast/AzuraCast/refs/tags/$(ynh_app_upstream_version)/util/docker/mariadb/mariadb/db.sql > init_db.sql
+# For some reason these 2 lines from the dump trigger : ERROR at line 1 in file: 'init_db.sql': Unknown command '\-'. .....
+#sed -i '/.*enable the sandbox mode.*/d' init_db.sql
+#mysql -B $app < init_db.sql
+
+#=================================================
+ynh_script_progression "Initializing $app..."
+#=================================================
+
+php8.4 src/backend/bin/console azuracast:setup --init --no-interaction || true  # First time it will crash saying `/var/www/azuracast/www_tmp` is not writable yet if you rerun it *is* able to write in it ...
+php8.4 src/backend/bin/console azuracast:setup --init --no-interaction
+php8.4 src/backend/bin/console migrations:migrate --no-interaction <<< "yes"
+
+# FIXME / TODO
+# For some reason the app complained about Field '<some file>' doesn't have a default value
+# ... a savage hack is to remove the STRICT_TRANS_TABLES from the sql mode ... though I have no clue if that's legit, that sounds pretty brutal
+# cf: SHOW VARIABLES LIKE 'sql_mode';
+# SET GLOBAL sql_mode='ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 
 #=================================================
 # END OF SCRIPT
