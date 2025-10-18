@@ -69,6 +69,9 @@ ynh_script_progression "Adding system configurations related to $app..."
 
 ynh_config_add_phpfpm
 
+# FIXME : we shouldnt have to do this zblerg
+sed -i "s@chdir =.*@chdir = $install_dir/src@g" /etc/php/$php_version/fpm/pool.d/$app.conf
+
 ynh_config_add_nginx
 
 #=================================================
