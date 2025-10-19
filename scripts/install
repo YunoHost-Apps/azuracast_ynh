@@ -50,15 +50,15 @@ ynh_config_add --template="azuracast.env" --destination="$install_dir/src/azurac
 
 for DIR in backups stations www_tmp storage
 do
-    ln -s $install_dir/$DIR $data_dir/$DIR
+    ln -s $data_dir/$DIR $install_dir/$DIR
 done
 
 #=================================================
 ynh_script_progression "Initializing $app..."
 #=================================================
 
-chown -R $app:$app /var/www/azuracast/www_tmp
-chmod -R 750 /var/www/azuracast/www_tmp
+#chown -R $app:$app /var/www/azuracast/www_tmp
+#chmod -R 750 /var/www/azuracast/www_tmp
 
 pushd $install_dir
     php8.4 src/backend/bin/console azuracast:setup --init --no-interaction || true  # First time it will crash saying `/var/www/azuracast/www_tmp` is not writable yet if you rerun it *is* able to write in it ...
@@ -66,8 +66,8 @@ pushd $install_dir
     php8.4 src/backend/bin/console azuracast:setup --init --no-interaction || true
 popd
 
-chown -R $app:$app /var/www/azuracast/www_tmp
-chmod -R 750 /var/www/azuracast/www_tmp
+#chown -R $app:$app /var/www/azuracast/www_tmp
+#chmod -R 750 /var/www/azuracast/www_tmp
 
 # Initialize the mysql db
 # Fucking archive doesnt shit the goddamn util/docker folder because of https://github.com/AzuraCast/AzuraCast/blob/main/.gitattributes#L21
