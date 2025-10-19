@@ -1,13 +1,7 @@
 #!/bin/bash
-### App file generated with YoloGen, the Yunohost app generator, version .
 
 source _common.sh
 source /usr/share/yunohost/helpers
-
-#=================================================
-# INSTALL DEPENDENCIES
-#=================================================
-ynh_script_progression "Installing dependencies..."
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -16,37 +10,24 @@ ynh_script_progression "Setting up source files..."
 
 ynh_setup_source --dest_dir="$install_dir/src"
 
-chown -R $app:www-data "$install_dir/src"
-
+chown -R $app:www-data "$install_dir"
 
 #=================================================
 # INSTALL APP
 #=================================================
-ynh_script_progression "Installing $app..."
+ynh_script_progression "Building $app... this will take some time..."
 
-pushd $install_dir
+pushd $install_dir/src
 
-    mkdir -p stations backups storage/uploads storage/shoutcast2 storage/stereo_tool storage/rsas storage/geoip storage/sftpgo storage/acm
-
-    cd src
-
+    composer_workdir=$install_dir/src
+    mv ../composer.phar ./
     ynh_composer_exec install --no-dev --no-autoloader 
     ynh_composer_exec dump-autoload --optimize --classmap-authoritative
 
-    npm ci
-    npm run build
+    ynh_exec_as_app npm ci
+    ynh_exec_as_app npm run build
 
 popd
-
-#=================================================
-# ADD A CONFIGURATION
-#=================================================
-#ynh_script_progression "Adding app's configuration file..."
-
-#ynh_config_add --template="" --destination="$install_dir/"
-#
-#chmod 400 "$install_dir/"
-#chown "$app:$app" "$install_dir/"
 
 
 #=================================================
@@ -60,9 +41,26 @@ ynh_config_add_nginx
 
 
 #=================================================
-# FINALIZE APP INSTALL WITH CURL
+ynh_script_progression "Configuring $app..."
 #=================================================
-ynh_script_progression "Finalizing installation..."
+
+redis_db=$(ynh_redis_get_free_db)
+
+ynh_config_add --template="azuracast.env" --destination="$install_dir/src/azuracast.env"
+
+for DIR in backups stations www_tmp storage
+do
+    ln -s $data_dir/$DIR $install_dir/$DIR
+done
+
+#=================================================
+ynh_script_progression "Initializing $app..."
+#=================================================
+
+pushd $install_dir
+    php8.4 src/backend/bin/console migrations:migrate --no-interaction
+    php8.4 src/backend/bin/console azuracast:setup --init --no-interaction
+popd
 
 #=================================================
 # END OF SCRIPT

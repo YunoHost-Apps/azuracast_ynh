@@ -19,11 +19,11 @@ admindoc = "https://www.azuracast.com/docs/"
 code = "https://github.com/AzuraCast/AzuraCast"
 
 [integration]
-yunohost = '>= 11.2.30'
+yunohost = '>= 12.1.25'
 helpers_version = "2.1"
-architectures = "amd64" 
+architectures = "amd64"
 multi_instance = false
-ldap = "false" 
+ldap = "false"
 sso = "false"
 disk = "50M"
 ram.build = "50M"
@@ -48,16 +48,37 @@ ram.runtime = "50M"
 
         autoupdate.strategy = "latest_github_tag"
 
+    # To be checked later but the upstream Docker does something like:
+
+    # wget "https://github.com/trummerschlunk/master_me/releases/download/1.2.0/master_me-1.2x-x86_64.tar.xz"
+    # mv master_me-1.2*x86_64.tar.xz master_me.tar.xz
+    # tar -xvf master_me.tar.xz --strip-components=1
+    # mkdir -p /usr/lib/ladspa
+    # mkdir -p /usr/lib/lv2
+    # mv ./master_me-easy-presets.lv2 /usr/lib/lv2
+    # mv ./master_me.lv2 /usr/lib/lv2
+    # mv ./master_me-ladspa.so /usr/lib/ladspa/master_me.so
+
+    # Dunno how important that is
+
+    [resources.system_user]
+
+    [resources.install_dir]
+    group = "www-data:r-x"
+
+    [resources.data_dir]
+    subdirs = ['backups', 'stations', 'www_tmp', 'storage/uploads', 'storage/uploads', 'storage/shoutcast2', 'storage/stereo_tool', 'storage/rsas', 'storage/geoip', 'storage/sftpgo', 'storage/acm']
+
     [resources.permissions]
     main.url = "/"
 
     [resources.apt]
     # libfdk-aac2 libtag2
-    packages = "mariadb-server tini gosu rsync tzdata ffmpeg vorbis-tools flac bubblewrap libao4 libfaad2 libgd3 liblo7 libmad0 libmagic1 libportaudio2 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsoundtouch1 libxpm4 libpulse0 libsamplerate0 libsrt1.5-openssl liblilv-0-0 libxml2 libxslt1.1 tmpreaper zstd libid3tag0 libboost-program-options1.81.0 libboost-filesystem1.81.0 libboost-regex1.81.0 php8.4-gd php8.4-curl php8.4-xml php8.4-zip php8.4-gmp php8.4-mysql php8.4-mbstring php8.4-intl php8.4-redis php8.4-maxminddb php8.4-uuid php8.4-ffi php8.4-sockets ladspa-sdk icecast2 liquidsoap "
+    packages = "mariadb-server tini gosu rsync tzdata ffmpeg vorbis-tools flac bubblewrap libao4 libfaad2 libgd3 liblo7 libmad0 libmagic1 libportaudio2 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsoundtouch1 libxpm4 libpulse0 libsamplerate0 libsrt1.5-openssl liblilv-0-0 libxml2 libxslt1.1 tmpreaper zstd libid3tag0 libboost-program-options1.81.0 libboost-filesystem1.81.0 libboost-regex1.81.0 php8.4-gd php8.4-curl php8.4-xml php8.4-zip php8.4-gmp php8.4-mysql php8.4-mbstring php8.4-intl php8.4-redis php8.4-maxminddb php8.4-uuid php8.4-ffi php8.4-sockets ladspa-sdk icecast2 liquidsoap redis-server"
 
     [resources.database]
     type = "mysql"
-    
+
     [resources.nodejs]
     version = "24"
 
