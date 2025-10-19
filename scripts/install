@@ -53,6 +53,16 @@ do
     ln -s $install_dir/$DIR $data_dir/$DIR
 done
 
+#=================================================
+ynh_script_progression "Initializing $app..."
+#=================================================
+
+pushd $install_dir
+    php8.4 src/backend/bin/console azuracast:setup --init --no-interaction || true  # First time it will crash saying `/var/www/azuracast/www_tmp` is not writable yet if you rerun it *is* able to write in it ...
+    php8.4 src/backend/bin/console azuracast:setup --init --no-interaction
+    php8.4 src/backend/bin/console migrations:migrate --no-interaction <<< "yes"
+popd
+
 # Initialize the mysql db
 # Fucking archive doesnt shit the goddamn util/docker folder because of https://github.com/AzuraCast/AzuraCast/blob/main/.gitattributes#L21
 # so we have to fetch this shit manually
@@ -61,13 +71,7 @@ done
 #sed -i '/.*enable the sandbox mode.*/d' init_db.sql
 #mysql -B $app < init_db.sql
 
-#=================================================
-ynh_script_progression "Initializing $app..."
-#=================================================
 
-php8.4 src/backend/bin/console azuracast:setup --init --no-interaction || true  # First time it will crash saying `/var/www/azuracast/www_tmp` is not writable yet if you rerun it *is* able to write in it ...
-php8.4 src/backend/bin/console azuracast:setup --init --no-interaction
-php8.4 src/backend/bin/console migrations:migrate --no-interaction <<< "yes"
 
 # FIXME / TODO
 # For some reason the app complained about Field '<some file>' doesn't have a default value
